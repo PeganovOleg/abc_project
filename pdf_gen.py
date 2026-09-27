@@ -119,14 +119,12 @@ def generate_pdf(obs) -> bytes:
     abc_table = Table(abc_data, colWidths=[6*cm, 6*cm, 6*cm])
     abc_table.setStyle(TableStyle([
         # Заголовок — светлый голубой градиент (60% светлее)
-        ('BACKGROUND', (0, 0), (0, 0), colors.HexColor('#90CAF9')),
-        ('BACKGROUND', (1, 0), (1, 0), colors.HexColor('#BBDEFB')),
-        ('BACKGROUND', (2, 0), (2, 0), colors.HexColor('#90CAF9')),
+        ('BACKGROUND', (0, 0), (0, 0), colors.HexColor('#C5DEFF')),
+        ('BACKGROUND', (1, 0), (1, 0), colors.HexColor('#D6EAFF')),
+        ('BACKGROUND', (2, 0), (2, 0), colors.HexColor('#C5DEFF')),
         ('TEXTCOLOR', (0, 0), (-1, 0), COLOR_TEXT),
         # Содержимое — чередование оттенков голубого
-        ('BACKGROUND', (0, 1), (0, 1), COLOR_BLUE_PALE),
-        ('BACKGROUND', (1, 1), (1, 1), colors.HexColor('#E8F4FD')),
-        ('BACKGROUND', (2, 1), (2, 1), COLOR_BLUE_PALE),
+        ('BACKGROUND', (0, 1), (-1, 1), colors.white),
         ('BOX', (0, 0), (-1, -1), 1, COLOR_BORDER),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, COLOR_BORDER),
         ('LEFTPADDING', (0, 0), (-1, -1), 10),
