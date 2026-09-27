@@ -61,8 +61,7 @@
       <div class="abc-field-hint">Что произошло ДО поведения?</div>
       <div class="voice-row">
         <textarea name="antecedent" id="antecedent" rows="4" required>{{ obs.antecedent }}</textarea>
-        <button type="button" class="btn-voice" onclick="startVoice('antecedent', this)">🎤</button>
-        <button type="button" class="btn-voice btn-clear" title="Очистить" onclick="document.getElementById('antecedent').value=''">✕</button>
+        <div class="voice-btns"><button type="button" class="btn-voice" onclick="startVoice('antecedent', this)">🎤</button><button type="button" class="btn-voice btn-clear" title="Очистить" onclick="document.getElementById('antecedent').value=''">✕</button></div>
       </div>
     </div>
     <div class="abc-field-block b-bg">
@@ -70,8 +69,7 @@
       <div class="abc-field-hint">Как себя повёл ребёнок?</div>
       <div class="voice-row">
         <textarea name="behavior" id="behavior" rows="4" required>{{ obs.behavior }}</textarea>
-        <button type="button" class="btn-voice" onclick="startVoice('behavior', this)">🎤</button>
-        <button type="button" class="btn-voice btn-clear" title="Очистить" onclick="document.getElementById('behavior').value=''">✕</button>
+        <div class="voice-btns"><button type="button" class="btn-voice" onclick="startVoice('behavior', this)">🎤</button><button type="button" class="btn-voice btn-clear" title="Очистить" onclick="document.getElementById('behavior').value=''">✕</button></div>
       </div>
     </div>
     <div class="abc-field-block c-bg">
@@ -79,8 +77,7 @@
       <div class="abc-field-hint">Что произошло ПОСЛЕ поведения?</div>
       <div class="voice-row">
         <textarea name="consequence" id="consequence" rows="4" required>{{ obs.consequence }}</textarea>
-        <button type="button" class="btn-voice" onclick="startVoice('consequence', this)">🎤</button>
-        <button type="button" class="btn-voice btn-clear" title="Очистить" onclick="document.getElementById('consequence').value=''">✕</button>
+        <div class="voice-btns"><button type="button" class="btn-voice" onclick="startVoice('consequence', this)">🎤</button><button type="button" class="btn-voice btn-clear" title="Очистить" onclick="document.getElementById('consequence').value=''">✕</button></div>
       </div>
     </div>
   </div>

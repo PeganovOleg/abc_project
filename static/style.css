@@ -89,7 +89,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .abc-field-label { font-weight: 700; font-size: 1rem; margin-bottom: 0.2rem; }
 .abc-field-hint { font-size: 0.85rem; color: #777; margin-bottom: 0.6rem; }
 .voice-row { display: flex; gap: 0.5rem; align-items: flex-start; }
-.voice-row textarea { flex: 1; }
+.voice-row textarea { flex: 1; min-height: 100px; }
 .btn-voice { background: white; border: 2px solid #2d6a9f; border-radius: 8px; padding: 0.5rem 0.7rem; font-size: 1.3rem; cursor: pointer; transition: all 0.2s; flex-shrink: 0; height: 42px; }
 .btn-voice:hover { background: #2d6a9f; }
 .btn-voice.recording { background: #e74c3c; border-color: #e74c3c; animation: pulse 1s infinite; }
@@ -160,3 +160,22 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 /* Clear button */
 .btn-clear { background: white; border: 2px solid #ef5350; color: #ef5350; font-size: 1.2rem; font-weight: 700; line-height: 1; }
 .btn-clear:hover { background: #ef5350; color: white; border-color: #ef5350; transform: scale(1.1); }
+
+@media (max-width: 600px) {
+  .voice-row { flex-wrap: wrap; }
+  .voice-row textarea { min-height: 130px; }
+  .btn-voice { width: 44px; height: 44px; font-size: 1.4rem; }
+  .btn-clear { width: 44px; height: 44px; font-size: 1.3rem; }
+  .voice-row .btn-voice, .voice-row .btn-clear {
+    flex: 0 0 44px;
+  }
+  /* Стек кнопок вертикально */
+  .voice-row > button { align-self: flex-start; }
+  .btn-clear { margin-top: 4px; }
+}
+
+/* Voice buttons wrapper */
+.voice-btns { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+@media (min-width: 601px) {
+  .voice-btns { flex-direction: row; }
+}
