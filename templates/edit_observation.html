@@ -3,11 +3,7 @@
 {% block content %}
 <h2>✏️ Редактировать наблюдение</h2>
 
-<div class="engine-selector">
-  <span class="engine-label">🎤 Распознавание речи:</span>
-  <button type="button" id="btn-yandex" class="engine-btn active" onclick="setEngine('yandex')">Яндекс SpeechKit</button>
-  <button type="button" id="btn-whisper" class="engine-btn" onclick="setEngine('whisper')">Whisper</button>
-</div>
+
 
 <form method="post" action="/observations/{{ obs.id }}/edit" class="obs-form">
 
