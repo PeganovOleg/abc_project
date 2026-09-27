@@ -50,7 +50,7 @@ def generate_pdf(obs) -> bytes:
     )
     style_cell_header = ParagraphStyle(
         'CellHeader', fontName='LiberationSans-Bold', fontSize=11,
-        textColor=COLOR_WHITE, leading=16
+        textColor=COLOR_TEXT, leading=16
     )
     style_function = ParagraphStyle(
         'Function', fontName='LiberationSans', fontSize=11,
@@ -118,11 +118,11 @@ def generate_pdf(obs) -> bytes:
     ]
     abc_table = Table(abc_data, colWidths=[6*cm, 6*cm, 6*cm])
     abc_table.setStyle(TableStyle([
-        # Заголовок — тёмно-синий градиент через три колонки
-        ('BACKGROUND', (0, 0), (0, 0), COLOR_HEADER_DARK),
-        ('BACKGROUND', (1, 0), (1, 0), COLOR_HEADER_MID),
-        ('BACKGROUND', (2, 0), (2, 0), colors.HexColor('#2196F3')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), COLOR_WHITE),
+        # Заголовок — светлый голубой градиент (60% светлее)
+        ('BACKGROUND', (0, 0), (0, 0), colors.HexColor('#90CAF9')),
+        ('BACKGROUND', (1, 0), (1, 0), colors.HexColor('#BBDEFB')),
+        ('BACKGROUND', (2, 0), (2, 0), colors.HexColor('#90CAF9')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), COLOR_TEXT),
         # Содержимое — чередование оттенков голубого
         ('BACKGROUND', (0, 1), (0, 1), COLOR_BLUE_PALE),
         ('BACKGROUND', (1, 1), (1, 1), colors.HexColor('#E8F4FD')),
