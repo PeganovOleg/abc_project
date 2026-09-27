@@ -58,6 +58,10 @@ def login(request: Request, username: str = Form(...), password: str = Form(...)
     response.set_cookie("access_token", create_token({"sub": user.username}), httponly=True, max_age=60*60*24*7)
     return response
 
+@app.get("/consent", response_class=HTMLResponse)
+def consent_page(request: Request):
+    return templates.TemplateResponse(request, "consent.html", {})
+
 @app.get("/logout")
 def logout():
     response = RedirectResponse("/login", status_code=303)
