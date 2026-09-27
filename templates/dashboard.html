@@ -48,6 +48,9 @@
     </div>
     <div class="obs-actions">
       <a href="/observations/{{ obs.id }}/pdf" class="btn btn-sm">📄 PDF</a>
+      {% if user.role != "admin" or obs.user_id == user.id %}
+      <a href="/observations/{{ obs.id }}/edit" class="btn btn-sm btn-edit">✏️ Редактировать</a>
+      {% endif %}
       <form method="post" action="/observations/{{ obs.id }}/delete" style="display:inline"
             onsubmit="return confirm('Удалить наблюдение?')">
         <button type="submit" class="btn btn-sm btn-danger">🗑 Удалить</button>

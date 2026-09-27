@@ -124,3 +124,45 @@ def delete_observation(obs_id: int, request: Request, db: Session = Depends(get_
     db.delete(obs)
     db.commit()
     return RedirectResponse("/dashboard", status_code=303)
+
+@router.get("/observations/{obs_id}/edit", response_class=HTMLResponse)
+def edit_observation_form(obs_id: int, request: Request, db: Session = Depends(get_db)):
+    user = get_current_user(request, db)
+    obs = db.query(Observation).filter(Observation.id == obs_id).first()
+    if not obs:
+        raise HTTPException(404)
+    if obs.user_id != user.id and user.role != "admin":
+        raise HTTPException(403)
+    return templates.TemplateResponse(request, "edit_observation.html", {"user": user, "obs": obs})
+
+@router.post("/observations/{obs_id}/edit")
+def edit_observation(
+    obs_id: int,
+    request: Request,
+    child_name: str = Form(...),
+    obs_date: str = Form(...),
+    obs_time: str = Form(...),
+    location: str = Form(...),
+    antecedent: str = Form(...),
+    behavior: str = Form(...),
+    consequence: str = Form(...),
+    function: str = Form(""),
+    db: Session = Depends(get_db)
+):
+    user = get_current_user(request, db)
+    obs = db.query(Observation).filter(Observation.id == obs_id).first()
+    if not obs:
+        raise HTTPException(404)
+    if obs.user_id != user.id and user.role != "admin":
+        raise HTTPException(403)
+    obs.child_name = child_name
+    obs.obs_date = obs_date
+    obs.obs_time = obs_time
+    obs.location = location
+    obs.antecedent = antecedent
+    obs.behavior = behavior
+    obs.consequence = consequence
+    obs.function = function
+    db.commit()
+    return RedirectResponse("/dashboard", status_code=303)
+

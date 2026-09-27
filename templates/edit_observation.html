@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Редактировать наблюдение — ABC Дневник{% endblock %}
+{% block content %}
+<h2>✏️ Редактировать наблюдение</h2>
+
+<div class="engine-selector">
+  <span class="engine-label">🎤 Распознавание речи:</span>
+  <button type="button" id="btn-yandex" class="engine-btn active" onclick="setEngine('yandex')">Яндекс SpeechKit</button>
+  <button type="button" id="btn-whisper" class="engine-btn" onclick="setEngine('whisper')">Whisper</button>
+</div>
+
+<form method="post" action="/observations/{{ obs.id }}/edit" class="obs-form">
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Имя ребёнка *</label>
+      <div class="child-select-wrap">
+        <select name="child_name" id="child_select" required onchange="onChildSelect(this)">
+          <option value="{{ obs.child_name }}" selected>{{ obs.child_name }}</option>
+        </select>
+        <button type="button" class="btn-add-small" onclick="showAddChild()">+ Добавить</button>
+      </div>
+      <div id="add-child-wrap" style="display:none; margin-top:6px;">
+        <input type="text" id="new-child-name" placeholder="Имя ребёнка" maxlength="50">
+        <button type="button" class="btn-add-small" onclick="addChild()">Сохранить</button>
+        <button type="button" class="btn-cancel-small" onclick="hideAddChild()">Отмена</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Дата *</label>
+      <input type="date" name="obs_date" value="{{ obs.obs_date }}" required>
+    </div>
+    <div class="form-group">
+      <label>Время *</label>
+      <input type="time" name="obs_time" value="{{ obs.obs_time }}" required>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Место *</label>
+    <select name="location" id="location_select" required onchange="onLocationSelect(this)">
+      <option value="{{ obs.location }}" selected>{{ obs.location }}</option>
+      <option>Класс / учебная комната</option>
+      <option>Коридор</option>
+      <option>Столовая / кухня</option>
+      <option>Игровая комната</option>
+      <option>Спальня</option>
+      <option>Улица / двор</option>
+      <option>Детская площадка</option>
+      <option>Магазин</option>
+      <option>Транспорт (автобус, машина)</option>
+      <option value="__other__">Другое...</option>
+    </select>
+    <input type="text" id="location_other" name="location_other" placeholder="Укажите место" style="display:none; margin-top:6px;">
+  </div>
+
+  <div class="abc-fields">
+    <div class="abc-field-block a-bg">
+      <div class="abc-field-label">A — Предшествующее событие</div>
+      <div class="abc-field-hint">Что произошло ДО поведения?</div>
+      <div class="voice-row">
+        <textarea name="antecedent" id="antecedent" rows="4" required>{{ obs.antecedent }}</textarea>
+        <button type="button" class="btn-voice" onclick="startVoice('antecedent', this)">🎤</button>
+      </div>
+    </div>
+    <div class="abc-field-block b-bg">
+      <div class="abc-field-label">B — Поведение</div>
+      <div class="abc-field-hint">Как себя повёл ребёнок?</div>
+      <div class="voice-row">
+        <textarea name="behavior" id="behavior" rows="4" required>{{ obs.behavior }}</textarea>
+        <button type="button" class="btn-voice" onclick="startVoice('behavior', this)">🎤</button>
+      </div>
+    </div>
+    <div class="abc-field-block c-bg">
+      <div class="abc-field-label">C — Последствия</div>
+      <div class="abc-field-hint">Что произошло ПОСЛЕ поведения?</div>
+      <div class="voice-row">
+        <textarea name="consequence" id="consequence" rows="4" required>{{ obs.consequence }}</textarea>
+        <button type="button" class="btn-voice" onclick="startVoice('consequence', this)">🎤</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Предполагаемая функция поведения</label>
+    <textarea name="function" rows="2">{{ obs.function or "" }}</textarea>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">💾 Сохранить изменения</button>
+    <a href="/dashboard" class="btn btn-secondary">Отмена</a>
+  </div>
+</form>
+
+<div id="voice-status" class="voice-status" style="display:none"></div>
+
+<script>
+async function loadChildren() {
+  const resp = await fetch('/api/profile/children');
+  const children = await resp.json();
+  const sel = document.getElementById('child_select');
+  const current = "{{ obs.child_name }}";
+  sel.innerHTML = '';
+  let found = false;
+  children.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.name;
+    opt.textContent = c.name;
+    if (c.name === current) { opt.selected = true; found = true; }
+    sel.appendChild(opt);
+  });
+  if (!found) {
+    const opt = document.createElement('option');
+    opt.value = current;
+    opt.textContent = current;
+    opt.selected = true;
+    sel.insertBefore(opt, sel.firstChild);
+  }
+}
+
+function showAddChild() {
+  document.getElementById('add-child-wrap').style.display = 'block';
+  document.getElementById('new-child-name').focus();
+}
+function hideAddChild() {
+  document.getElementById('add-child-wrap').style.display = 'none';
+  document.getElementById('new-child-name').value = '';
+}
+
+async function addChild() {
+  const name = document.getElementById('new-child-name').value.trim();
+  if (!name) return;
+  const fd = new FormData();
+  fd.append('name', name);
+  const resp = await fetch('/api/profile/children/add', {method: 'POST', body: fd});
+  const data = await resp.json();
+  if (data.error) { alert(data.error); return; }
+  hideAddChild();
+  await loadChildren();
+  const sel = document.getElementById('child_select');
+  for (let opt of sel.options) {
+    if (opt.value === name) { opt.selected = true; break; }
+  }
+}
+
+function onLocationSelect(sel) {
+  const other = document.getElementById('location_other');
+  if (sel.value === '__other__') {
+    other.style.display = 'block';
+    other.required = true;
+    other.name = 'location';
+    sel.name = '';
+  } else {
+    other.style.display = 'none';
+    other.required = false;
+    other.name = 'location_other';
+    sel.name = 'location';
+  }
+}
+
+loadChildren();
+</script>
+<script src="/static/recorder.js"></script>
+{% endblock %}
