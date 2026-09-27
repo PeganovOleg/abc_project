@@ -2,8 +2,8 @@
 {% block title %}Дашборд — ABC Дневник{% endblock %}
 {% block content %}
 <div class="dashboard-header">
-  <h2>📋 Наблюдения{% if user.role == "admin" %} <span class="admin-badge">все родители</span>{% endif %}</h2>
-  {% if user.role != "admin" %}
+  <h2>📋 Наблюдения{% if user.role in ("admin", "superadmin") %} <span class="admin-badge">все родители</span>{% endif %}</h2>
+  {% if user.role not in ("admin", "superadmin") %}
   <a href="/observations/new" class="btn btn-primary">+ Новое наблюдение</a>
   {% endif %}
 </div>
@@ -15,7 +15,7 @@
       name="q"
       id="search-input"
       value="{{ q }}"
-      placeholder="{% if user.role == 'admin' %}🔍 Имя ребёнка или родителя...{% else %}🔍 Имя ребёнка...{% endif %}"
+      placeholder="{% if user.role in ("admin", "superadmin") %}🔍 Имя ребёнка или родителя...{% else %}🔍 Имя ребёнка...{% endif %}"
       autocomplete="off"
     >
     <button type="submit" class="btn btn-secondary">Найти</button>
@@ -34,7 +34,7 @@
       <span class="obs-child">👦 {{ obs.child_name }}</span>
       <span class="obs-date">📅 {{ obs.obs_date }} {{ obs.obs_time }}</span>
       <span class="obs-location">📍 {{ obs.location }}</span>
-      {% if user.role == "admin" %}
+      {% if user.role in ("admin", "superadmin") %}
       <span class="obs-author">👤 {{ obs.observer_name }}</span>
       {% endif %}
     </div>
@@ -48,7 +48,7 @@
     </div>
     <div class="obs-actions">
       <a href="/observations/{{ obs.id }}/pdf" class="btn btn-sm">📄 PDF</a>
-      {% if user.role != "admin" or obs.user_id == user.id %}
+      {% if user.role not in ("admin", "superadmin") or obs.user_id == user.id %}
       <a href="/observations/{{ obs.id }}/edit" class="btn btn-sm btn-edit">✏️ Редактировать</a>
       {% endif %}
       <form method="post" action="/observations/{{ obs.id }}/delete" style="display:inline"
@@ -66,7 +66,7 @@
   <a href="/dashboard" class="btn btn-secondary">Сбросить</a>
   {% else %}
   <p>Наблюдений пока нет.</p>
-  {% if user.role != "admin" %}
+  {% if user.role not in ("admin", "superadmin") %}
   <a href="/observations/new" class="btn btn-primary">+ Добавить первое</a>
   {% endif %}
   {% endif %}

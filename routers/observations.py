@@ -18,7 +18,7 @@ def dashboard(request: Request, q: str = "", db: Session = Depends(get_db)):
     user = get_current_user(request, db)
     search = q.strip().lower()
 
-    if user.role == "admin":
+    if user.role in ("admin", "superadmin"):
         # Подгружаем все наблюдения + автора
         all_obs = (
             db.query(Observation, User)
@@ -99,7 +99,7 @@ def download_pdf(obs_id: int, request: Request, db: Session = Depends(get_db)):
     obs = db.query(Observation).filter(Observation.id == obs_id).first()
     if not obs:
         raise HTTPException(404)
-    if obs.user_id != user.id and user.role != "admin":
+    if obs.user_id != user.id and user.role not in ("admin", "superadmin"):
         raise HTTPException(403)
     pdf_bytes = generate_pdf(obs)
     safe_user = re.sub(r'[^\w\s-]', '', obs.observer_name or "user").strip().replace(' ', '_')
@@ -119,7 +119,7 @@ def delete_observation(obs_id: int, request: Request, db: Session = Depends(get_
     obs = db.query(Observation).filter(Observation.id == obs_id).first()
     if not obs:
         raise HTTPException(404)
-    if obs.user_id != user.id and user.role != "admin":
+    if obs.user_id != user.id and user.role not in ("admin", "superadmin"):
         raise HTTPException(403)
     db.delete(obs)
     db.commit()
@@ -131,7 +131,7 @@ def edit_observation_form(obs_id: int, request: Request, db: Session = Depends(g
     obs = db.query(Observation).filter(Observation.id == obs_id).first()
     if not obs:
         raise HTTPException(404)
-    if obs.user_id != user.id and user.role != "admin":
+    if obs.user_id != user.id and user.role not in ("admin", "superadmin"):
         raise HTTPException(403)
     return templates.TemplateResponse(request, "edit_observation.html", {"user": user, "obs": obs})
 
@@ -153,7 +153,7 @@ def edit_observation(
     obs = db.query(Observation).filter(Observation.id == obs_id).first()
     if not obs:
         raise HTTPException(404)
-    if obs.user_id != user.id and user.role != "admin":
+    if obs.user_id != user.id and user.role not in ("admin", "superadmin"):
         raise HTTPException(403)
     obs.child_name = child_name
     obs.obs_date = obs_date
