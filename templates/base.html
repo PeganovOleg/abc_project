@@ -4,11 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{% block title %}ABC Дневник{% endblock %}</title>
-<link rel="stylesheet" href="/static/style.css?v=3">
+<link rel="stylesheet" href="/static/style.css?v=4">
 </head>
 <body>
 {% if user %}
 <nav class="navbar">
+  <!-- Десктоп: всё как было -->
   <div class="nav-brand">📋 ABC Дневник</div>
   <div class="nav-links">
     <a href="/dashboard">Мои записи</a>
@@ -19,8 +20,25 @@
     <a href="/logout" class="btn-logout">Выйти</a>
   </div>
   <div class="nav-user">👤 {{ user.full_name }}</div>
+
+  <!-- Мобилка: имя + бургер -->
+  <div class="nav-mobile-right">
+    <span class="nav-user-mobile">👤 {{ user.full_name }}</span>
+    <button class="burger-btn" id="burgerBtn" onclick="toggleMenu()" aria-label="Меню">☰</button>
+  </div>
 </nav>
+
+<!-- Мобильное выпадающее меню -->
+<div class="mobile-menu" id="mobileMenu">
+  <a href="/dashboard" onclick="closeMenu()">📋 Мои записи</a>
+  <a href="/observations/new" onclick="closeMenu()">✏️ Новая запись</a>
+  {% if user.role in ('admin', 'superadmin') %}
+  <a href="/admin/" onclick="closeMenu()">{% if user.role == 'superadmin' %}👑 Суперадмин{% else %}Админка{% endif %}</a>
+  {% endif %}
+  <a href="/logout" class="mobile-logout">🚪 Выйти</a>
+</div>
 {% endif %}
+
 <main class="container">
   {% block content %}{% endblock %}
 </main>
@@ -30,6 +48,26 @@ const btn = document.getElementById('scrollTopBtn');
 window.addEventListener('scroll', () => {
   btn.style.opacity = window.scrollY > 300 ? '1' : '0';
   btn.style.pointerEvents = window.scrollY > 300 ? 'auto' : 'none';
+});
+
+function toggleMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const burger = document.getElementById('burgerBtn');
+  menu.classList.toggle('open');
+  burger.textContent = menu.classList.contains('open') ? '✕' : '☰';
+}
+function closeMenu() {
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('burgerBtn').textContent = '☰';
+}
+// Закрыть при клике вне меню
+document.addEventListener('click', function(e) {
+  const menu = document.getElementById('mobileMenu');
+  const burger = document.getElementById('burgerBtn');
+  if (menu && !menu.contains(e.target) && !burger.contains(e.target)) {
+    menu.classList.remove('open');
+    burger.textContent = '☰';
+  }
 });
 </script>
 </body>
