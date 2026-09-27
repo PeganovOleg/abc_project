@@ -261,3 +261,5 @@ body > main { padding-top: 0.5rem; }
   .nav-brand { font-size: 0.95rem; white-space: nowrap; flex-shrink: 0; }
   .nav-user-mobile { font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
 }
+
+.alert-warning { background: #FFF8E1; color: #E65100; border: 1px solid #FFE082; border-radius: 8px; padding: 0.8rem 1rem; margin-bottom: 1rem; font-size: 0.95rem; }

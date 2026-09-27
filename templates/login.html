@@ -14,6 +14,9 @@
     {% if error %}
     <div class="alert alert-error">{{ error }}</div>
     {% endif %}
+    {% if request.query_params.get("msg") == "auth" %}
+    <div class="alert alert-warning">🔒 Пожалуйста, войдите в систему для доступа к этой странице</div>
+    {% endif %}
     <form method="post" action="/login">
       <div class="form-group">
         <label>Логин</label>

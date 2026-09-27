@@ -1,7 +1,7 @@
 import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '.pylocal', 'lib', 'python3.11', 'site-packages'))
 
-from fastapi import FastAPI, Request, Form, Depends
+from fastapi import FastAPI, Request, Form, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -18,6 +18,10 @@ Base.metadata.create_all(bind=engine)
 app = FastAPI(title="ABC Дневник")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
+
+@app.exception_handler(401)
+async def unauthorized_handler(request: Request, exc):
+    return RedirectResponse("/login?msg=auth", status_code=302)
 
 app.include_router(admin.router)
 app.include_router(observations.router)
