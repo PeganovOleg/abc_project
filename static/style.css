@@ -158,5 +158,5 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .consent-label a { color: #1976D2; }
 
 /* Clear button */
-.btn-clear { background: white; border: 2px solid #ef5350; color: #ef5350; font-size: 1.1rem; }
-.btn-clear:hover { background: #fde8e8; border-color: #b71c1c; }
+.btn-clear { background: white; border: 2px solid #ef5350; color: #ef5350; font-size: 1.2rem; font-weight: 700; line-height: 1; }
+.btn-clear:hover { background: #ef5350; color: white; border-color: #ef5350; transform: scale(1.1); }
