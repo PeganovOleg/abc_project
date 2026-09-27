@@ -12,7 +12,7 @@
   <!-- Десктоп: всё как было -->
   <div class="nav-brand">📋 ABC Дневник</div>
   <div class="nav-links">
-    <a href="/dashboard">Мои записи</a>
+    {% if user.role in ("admin", "superadmin") %}<a href="/dashboard">Записи пользователей</a>{% else %}<a href="/dashboard">Мои записи</a>{% endif %}
     <a href="/observations/new">+ Новая запись</a>
     {% if user.role in ('admin', 'superadmin') %}
     <a href="/admin/">{% if user.role == 'superadmin' %}👑 Суперадмин{% else %}Админка{% endif %}</a>
@@ -30,7 +30,7 @@
 
 <!-- Мобильное выпадающее меню -->
 <div class="mobile-menu" id="mobileMenu">
-  <a href="/dashboard" onclick="closeMenu()">📋 Мои записи</a>
+  {% if user.role in ("admin", "superadmin") %}<a href="/dashboard" onclick="closeMenu()">📋 Записи пользователей</a>{% else %}<a href="/dashboard" onclick="closeMenu()">📋 Мои записи</a>{% endif %}
   <a href="/observations/new" onclick="closeMenu()">✏️ Новая запись</a>
   {% if user.role in ('admin', 'superadmin') %}
   <a href="/admin/" onclick="closeMenu()">{% if user.role == 'superadmin' %}👑 Суперадмин{% else %}Админка{% endif %}</a>
