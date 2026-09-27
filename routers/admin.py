@@ -50,6 +50,29 @@ def create_user(request: Request, full_name: str = Form(...), db: Session = Depe
         "users": users, "new_user": {"username": username, "password": password, "full_name": full_name}
     })
 
+
+@router.get("/users/{user_id}/edit", response_class=HTMLResponse)
+def edit_user_form(user_id: int, request: Request, db: Session = Depends(get_db)):
+    current = require_admin(request, db)
+    u = db.query(User).filter(User.id == user_id).first()
+    if not u:
+        raise HTTPException(status_code=404)
+    return templates.TemplateResponse(request, "admin/edit_user.html", {"user": current, "edit_user": u})
+
+@router.post("/users/{user_id}/edit")
+def edit_user(user_id: int, request: Request,
+              full_name: str = Form(...),
+              observer_role: str = Form(default=""),
+              db: Session = Depends(get_db)):
+    current = require_admin(request, db)
+    u = db.query(User).filter(User.id == user_id).first()
+    if not u:
+        raise HTTPException(status_code=404)
+    u.full_name = full_name.strip()
+    u.observer_role = observer_role.strip() or None
+    db.commit()
+    return RedirectResponse("/admin/users", status_code=303)
+
 @router.post("/users/{user_id}/toggle")
 def toggle_user(user_id: int, request: Request, db: Session = Depends(get_db)):
     admin = require_admin(request, db)

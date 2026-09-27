@@ -11,6 +11,7 @@ class User(Base):
     full_name = Column(String, nullable=False)
     role = Column(String, default="parent")
     is_active = Column(Boolean, default=True)
+    observer_role = Column(String, nullable=True)  # роль наблюдателя: мама, папа, сестра...
     created_at = Column(DateTime, default=datetime.utcnow)
     observations = relationship("Observation", back_populates="author")
     children = relationship("Child", back_populates="parent", cascade="all, delete")

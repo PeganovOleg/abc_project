@@ -83,6 +83,7 @@ function copyToClipboard(elementId) {
         <td>{{ u.created_at.strftime('%d.%m.%Y') }}</td>
         <td>
           {% if u.id != user.id %}
+          <a href="/admin/users/{{ u.id }}/edit" class="btn btn-sm btn-secondary">✏️ Изменить</a>
           {% if u.role != "superadmin" %}
           <form method="post" action="/admin/users/{{ u.id }}/toggle" style="display:inline">
             <button type="submit" class="btn btn-sm {% if u.is_active %}btn-warning{% else %}btn-success{% endif %}">

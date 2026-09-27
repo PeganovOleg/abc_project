@@ -57,6 +57,13 @@ def generate_pdf(obs) -> bytes:
         textColor=COLOR_TEXT, leading=16
     )
 
+    # Имя наблюдателя с ролью в скобках
+    author = obs.author if hasattr(obs, "author") and obs.author else None
+    observer_role = getattr(author, "observer_role", None) if author else None
+    observer_display = obs.observer_name
+    if observer_role:
+        observer_display = f"{obs.observer_name} ({observer_role})"
+
     elements = []
 
     # === TITLE ===
@@ -83,7 +90,7 @@ def generate_pdf(obs) -> bytes:
 
     # === HEADER INFO — очень светлый голубой ===
     header_data = [
-        [Paragraph("Имя наблюдателя:", style_label), Paragraph(obs.observer_name, style_normal),
+        [Paragraph("Имя наблюдателя:", style_label), Paragraph(observer_display, style_normal),
          Paragraph("Дата:", style_label), Paragraph(obs.obs_date, style_normal)],
         [Paragraph("Время:", style_label), Paragraph(obs.obs_time, style_normal),
          Paragraph("Место:", style_label), Paragraph(obs.location, style_normal)],
