@@ -13,8 +13,8 @@
   <div class="nav-links">
     <a href="/dashboard">Мои записи</a>
     <a href="/observations/new">+ Новая запись</a>
-    {% if user.role == 'admin' %}
-    <a href="/admin/">Админка</a>
+    {% if user.role in ('admin', 'superadmin') %}
+    <a href="/admin/">{% if user.role == 'superadmin' %}👑 Суперадмин{% else %}Админка{% endif %}</a>
     {% endif %}
     <a href="/logout" class="btn-logout">Выйти</a>
   </div>
