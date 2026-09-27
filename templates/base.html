@@ -24,5 +24,13 @@
 <main class="container">
   {% block content %}{% endblock %}
 </main>
+<button class="scroll-top" id="scrollTopBtn" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Наверх">↑</button>
+<script>
+const btn = document.getElementById('scrollTopBtn');
+window.addEventListener('scroll', () => {
+  btn.style.opacity = window.scrollY > 300 ? '1' : '0';
+  btn.style.pointerEvents = window.scrollY > 300 ? 'auto' : 'none';
+});
+</script>
 </body>
 </html>
