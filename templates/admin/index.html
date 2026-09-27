@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Админка — ABC Дневник{% endblock %}
+{% block content %}
+<h2>Панель администратора</h2>
+<div class="admin-cards">
+  <a href="/admin/users" class="admin-card">
+    <div class="admin-card-icon">👥</div>
+    <div class="admin-card-title">Пользователи</div>
+    <div class="admin-card-count">{{ users|length }}</div>
+  </a>
+  <a href="/admin/settings" class="admin-card">
+    <div class="admin-card-icon">⚙️</div>
+    <div class="admin-card-title">Настройки API</div>
+    <div class="admin-card-count">SaluteSpeech</div>
+  </a>
+</div>
+{% endblock %}

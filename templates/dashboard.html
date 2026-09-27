@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Дашборд — ABC Дневник{% endblock %}
+{% block content %}
+<div class="dashboard-header">
+  <h2>📋 Наблюдения{% if user.role == "admin" %} <span class="admin-badge">все родители</span>{% endif %}</h2>
+  {% if user.role != "admin" %}
+  <a href="/observations/new" class="btn btn-primary">+ Новое наблюдение</a>
+  {% endif %}
+</div>
+
+<form method="get" action="/dashboard" class="filter-form" id="search-form">
+  <div class="search-wrap">
+    <input
+      type="text"
+      name="q"
+      id="search-input"
+      value="{{ q }}"
+      placeholder="{% if user.role == 'admin' %}🔍 Имя ребёнка или родителя...{% else %}🔍 Имя ребёнка...{% endif %}"
+      autocomplete="off"
+    >
+    <button type="submit" class="btn btn-secondary">Найти</button>
+    {% if q %}
+    <a href="/dashboard" class="btn btn-secondary">✕</a>
+    {% endif %}
+  </div>
+</form>
+
+{% if observations %}
+<div class="obs-count">Найдено: {{ observations|length }}</div>
+<div class="obs-list">
+  {% for obs in observations %}
+  <div class="obs-card">
+    <div class="obs-card-header">
+      <span class="obs-child">👦 {{ obs.child_name }}</span>
+      <span class="obs-date">📅 {{ obs.obs_date }} {{ obs.obs_time }}</span>
+      <span class="obs-location">📍 {{ obs.location }}</span>
+      {% if user.role == "admin" %}
+      <span class="obs-author">👤 {{ obs.observer_name }}</span>
+      {% endif %}
+    </div>
+    <div class="obs-body">
+      <div class="obs-abc a-bg"><strong>A:</strong> {{ obs.antecedent }}</div>
+      <div class="obs-abc b-bg"><strong>B:</strong> {{ obs.behavior }}</div>
+      <div class="obs-abc c-bg"><strong>C:</strong> {{ obs.consequence }}</div>
+      {% if obs.function %}
+      <div class="obs-function"><strong>Функция:</strong> {{ obs.function }}</div>
+      {% endif %}
+    </div>
+    <div class="obs-actions">
+      <a href="/observations/{{ obs.id }}/pdf" class="btn btn-sm">📄 PDF</a>
+      <form method="post" action="/observations/{{ obs.id }}/delete" style="display:inline"
+            onsubmit="return confirm('Удалить наблюдение?')">
+        <button type="submit" class="btn btn-sm btn-danger">🗑 Удалить</button>
+      </form>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  {% if q %}
+  <p>По запросу «{{ q }}» ничего не найдено.</p>
+  <a href="/dashboard" class="btn btn-secondary">Сбросить</a>
+  {% else %}
+  <p>Наблюдений пока нет.</p>
+  {% if user.role != "admin" %}
+  <a href="/observations/new" class="btn btn-primary">+ Добавить первое</a>
+  {% endif %}
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

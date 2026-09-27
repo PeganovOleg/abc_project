@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Пользователи — Админка{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2>Пользователи</h2>
+  <a href="/admin/" class="btn btn-secondary">← Назад</a>
+</div>
+
+{% if new_user %}
+<div class="alert alert-success">
+  ✅ Пользователь создан!<br>
+  <strong>Логин:</strong> <code id="new-username">{{ new_user.username }}</code>
+  <button type="button" class="btn btn-sm btn-secondary" onclick="copyToClipboard('new-username')">📋 Копировать</button><br>
+  <strong>Пароль:</strong> <code id="new-password">{{ new_user.password }}</code>
+  <button type="button" class="btn btn-sm btn-secondary" onclick="copyToClipboard('new-password')">📋 Копировать</button><br>
+  <em>Сохраните пароль — он больше не будет показан.</em>
+</div>
+
+<script>
+function copyToClipboard(elementId) {
+  const text = document.getElementById(elementId).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    const oldText = btn.innerText;
+    btn.innerText = '✅ Скопировано!';
+    setTimeout(() => btn.innerText = oldText, 1500);
+  });
+}
+</script>
+{% endif %}
+
+<div class="card">
+  <h3>Создать пользователя</h3>
+  <form method="post" action="/admin/users/create" class="inline-form">
+    <input type="text" name="full_name" required placeholder="Полное имя (например: Иванова Мария)">
+    <button type="submit" class="btn btn-primary">Создать</button>
+  </form>
+</div>
+
+<div class="card">
+  <h3>Список пользователей</h3>
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Имя</th>
+        <th>Логин</th>
+        <th>Роль</th>
+        <th>Статус</th>
+        <th>Зарегистрирован</th>
+        <th>Действия</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr class="{% if not u.is_active %}row-blocked{% endif %}">
+        <td>{{ u.full_name }}</td>
+        <td><code>{{ u.username }}</code></td>
+        <td>{{ '👑 Админ' if u.role == 'admin' else '👤 Родитель' }}</td>
+        <td>
+          {% if u.is_active %}
+            <span class="badge badge-green">Активен</span>
+          {% else %}
+            <span class="badge badge-red">Заблокирован</span>
+          {% endif %}
+        </td>
+        <td>{{ u.created_at.strftime('%d.%m.%Y') }}</td>
+        <td>
+          {% if u.role != 'admin' %}
+          <form method="post" action="/admin/users/{{ u.id }}/toggle" style="display:inline">
+            <button type="submit" class="btn btn-sm {% if u.is_active %}btn-warning{% else %}btn-success{% endif %}">
+              {% if u.is_active %}🔒 Блок{% else %}🔓 Разблок{% endif %}
+            </button>
+          </form>
+          <form method="post" action="/admin/users/{{ u.id }}/delete" style="display:inline"
+                onsubmit="return confirm('Удалить пользователя {{ u.full_name }}?')">
+            <button type="submit" class="btn btn-sm btn-danger">🗑</button>
+          </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

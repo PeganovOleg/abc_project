@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block title %}Новое наблюдение — ABC Дневник{% endblock %}
+{% block content %}
+<h2>Новое наблюдение ABC</h2>
+
+<div class="engine-selector">
+  <span class="engine-label">🎤 Распознавание речи:</span>
+  <button type="button" id="btn-yandex" class="engine-btn active" onclick="setEngine('yandex')">Яндекс SpeechKit</button>
+  <button type="button" id="btn-whisper" class="engine-btn" onclick="setEngine('whisper')">Whisper</button>
+</div>
+
+<form method="post" action="/observations/new" class="obs-form">
+
+  <div class="form-row">
+    <!-- Имя ребёнка: выбор из списка + добавление -->
+    <div class="form-group">
+      <label>Имя ребёнка *</label>
+      <div class="child-select-wrap">
+        <select name="child_name" id="child_select" required onchange="onChildSelect(this)">
+          <option value="">— выберите —</option>
+        </select>
+        <button type="button" class="btn-add-small" onclick="showAddChild()">+ Добавить</button>
+      </div>
+      <div id="add-child-wrap" style="display:none; margin-top:6px;">
+        <input type="text" id="new-child-name" placeholder="Имя ребёнка" maxlength="50">
+        <button type="button" class="btn-add-small" onclick="addChild()">Сохранить</button>
+        <button type="button" class="btn-cancel-small" onclick="hideAddChild()">Отмена</button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Дата *</label>
+      <input type="date" name="obs_date" required>
+    </div>
+    <div class="form-group">
+      <label>Время *</label>
+      <input type="time" name="obs_time" required>
+    </div>
+  </div>
+
+  <!-- Место: выбор из списка -->
+  <div class="form-group">
+    <label>Место *</label>
+    <select name="location" id="location_select" required onchange="onLocationSelect(this)">
+      <option value="">— выберите место —</option>
+      <option>Класс / учебная комната</option>
+      <option>Коридор</option>
+      <option>Столовая / кухня</option>
+      <option>Игровая комната</option>
+      <option>Спальня</option>
+      <option>Улица / двор</option>
+      <option>Детская площадка</option>
+      <option>Магазин</option>
+      <option>Транспорт (автобус, машина)</option>
+      <option value="__other__">Другое...</option>
+    </select>
+    <input type="text" id="location_other" name="location_other" placeholder="Укажите место" style="display:none; margin-top:6px;">
+  </div>
+
+  <div class="abc-fields">
+    <div class="abc-field-block a-bg">
+      <div class="abc-field-label">A — Предшествующее событие</div>
+      <div class="abc-field-hint">Что произошло ДО поведения?</div>
+      <div class="voice-row">
+        <textarea name="antecedent" id="antecedent" rows="4" required placeholder="Опишите что произошло до поведения ребёнка..."></textarea>
+        <button type="button" class="btn-voice" onclick="startVoice('antecedent', this)">🎤</button>
+      </div>
+    </div>
+    <div class="abc-field-block b-bg">
+      <div class="abc-field-label">B — Поведение</div>
+      <div class="abc-field-hint">Как себя повёл ребёнок?</div>
+      <div class="voice-row">
+        <textarea name="behavior" id="behavior" rows="4" required placeholder="Опишите поведение ребёнка..."></textarea>
+        <button type="button" class="btn-voice" onclick="startVoice('behavior', this)">🎤</button>
+      </div>
+    </div>
+    <div class="abc-field-block c-bg">
+      <div class="abc-field-label">C — Последствия</div>
+      <div class="abc-field-hint">Что произошло ПОСЛЕ поведения?</div>
+      <div class="voice-row">
+        <textarea name="consequence" id="consequence" rows="4" required placeholder="Опишите что произошло после..."></textarea>
+        <button type="button" class="btn-voice" onclick="startVoice('consequence', this)">🎤</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Предполагаемая функция поведения</label>
+    <textarea name="function" rows="2" placeholder="Например: привлечение внимания, избегание задания..."></textarea>
+  </div>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">💾 Сохранить</button>
+    <a href="/dashboard" class="btn btn-secondary">Отмена</a>
+  </div>
+</form>
+
+<div id="voice-status" class="voice-status" style="display:none"></div>
+
+<script>
+// Загружаем детей при открытии страницы
+async function loadChildren() {
+  const resp = await fetch('/api/profile/children');
+  const children = await resp.json();
+  const sel = document.getElementById('child_select');
+  sel.innerHTML = '<option value="">— выберите —</option>';
+  children.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.name;
+    opt.textContent = c.name;
+    opt.dataset.id = c.id;
+    sel.appendChild(opt);
+  });
+  // Кнопки удаления
+  updateChildButtons(children);
+}
+
+function updateChildButtons(children) {
+  let wrap = document.getElementById('child-list-btns');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  children.forEach(c => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-remove-child';
+    btn.textContent = '✕ ' + c.name;
+    btn.onclick = () => deleteChild(c.id);
+    wrap.appendChild(btn);
+  });
+}
+
+function onChildSelect(sel) {
+  // Просто выбор — ничего особенного
+}
+
+function showAddChild() {
+  document.getElementById('add-child-wrap').style.display = 'block';
+  document.getElementById('new-child-name').focus();
+}
+function hideAddChild() {
+  document.getElementById('add-child-wrap').style.display = 'none';
+  document.getElementById('new-child-name').value = '';
+}
+
+async function addChild() {
+  const name = document.getElementById('new-child-name').value.trim();
+  if (!name) return;
+  const fd = new FormData();
+  fd.append('name', name);
+  const resp = await fetch('/api/profile/children/add', {method: 'POST', body: fd});
+  const data = await resp.json();
+  if (data.error) { alert(data.error); return; }
+  hideAddChild();
+  await loadChildren();
+  // Выбираем только что добавленного
+  const sel = document.getElementById('child_select');
+  for (let opt of sel.options) {
+    if (opt.value === name) { opt.selected = true; break; }
+  }
+}
+
+async function deleteChild(id) {
+  if (!confirm('Удалить ребёнка из списка?')) return;
+  await fetch('/api/profile/children/delete/' + id, {method: 'POST'});
+  await loadChildren();
+}
+
+function onLocationSelect(sel) {
+  const other = document.getElementById('location_other');
+  if (sel.value === '__other__') {
+    other.style.display = 'block';
+    other.required = true;
+    other.name = 'location';
+    sel.name = '';
+  } else {
+    other.style.display = 'none';
+    other.required = false;
+    other.name = 'location_other';
+    sel.name = 'location';
+  }
+}
+
+loadChildren();
+</script>
+<script src="/static/recorder.js"></script>
+{% endblock %}

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}ABC Дневник{% endblock %}</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+{% if user %}
+<nav class="navbar">
+  <div class="nav-brand">📋 ABC Дневник</div>
+  <div class="nav-links">
+    <a href="/dashboard">Мои записи</a>
+    <a href="/observations/new">+ Новая запись</a>
+    {% if user.role == 'admin' %}
+    <a href="/admin/">Админка</a>
+    {% endif %}
+    <a href="/logout" class="btn-logout">Выйти</a>
+  </div>
+  <div class="nav-user">👤 {{ user.full_name }}</div>
+</nav>
+{% endif %}
+<main class="container">
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

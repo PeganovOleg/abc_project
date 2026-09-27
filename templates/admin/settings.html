@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Настройки API — Админка{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2>Настройки голосового распознавания</h2>
+  <a href="/admin/" class="btn btn-secondary">← Назад</a>
+</div>
+
+{% if saved %}
+<div class="alert alert-success">✅ Настройки сохранены!</div>
+{% endif %}
+
+<div class="card">
+  <h3>🎙 Яндекс SpeechKit</h3>
+  <p>Получить ключ: <a href="https://console.yandex.cloud" target="_blank">console.yandex.cloud</a> → IAM → Сервисные аккаунты → API-ключи.<br>
+  Роль сервисного аккаунта: <code>ai.speechkit.user</code>. Ключ начинается с <code>AQVN...</code></p>
+  <form method="post" action="/admin/settings">
+    <div class="form-group">
+      <label>API-ключ Яндекс SpeechKit</label>
+      <input type="password" name="yandex_api_key" value="{{ yandex_api_key }}"
+             placeholder="AQVNxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+             style="font-family:monospace; width:100%">
+      <small style="color:#888">Оставьте пустым, чтобы не менять сохранённый ключ</small>
+    </div>
+    <button type="submit" class="btn btn-primary">💾 Сохранить</button>
+  </form>
+</div>
+{% endblock %}
