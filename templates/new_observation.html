@@ -64,6 +64,7 @@
       <div class="voice-row">
         <textarea name="antecedent" id="antecedent" rows="4" required placeholder="Опишите что произошло до поведения ребёнка..."></textarea>
         <button type="button" class="btn-voice" onclick="startVoice('antecedent', this)">🎤</button>
+        <button type="button" class="btn-voice btn-clear" title="Очистить" onclick="document.getElementById('antecedent').value=''">🗑️</button>
       </div>
     </div>
     <div class="abc-field-block b-bg">
@@ -72,6 +73,7 @@
       <div class="voice-row">
         <textarea name="behavior" id="behavior" rows="4" required placeholder="Опишите поведение ребёнка..."></textarea>
         <button type="button" class="btn-voice" onclick="startVoice('behavior', this)">🎤</button>
+        <button type="button" class="btn-voice btn-clear" title="Очистить" onclick="document.getElementById('behavior').value=''">🗑️</button>
       </div>
     </div>
     <div class="abc-field-block c-bg">
@@ -80,6 +82,7 @@
       <div class="voice-row">
         <textarea name="consequence" id="consequence" rows="4" required placeholder="Опишите что произошло после..."></textarea>
         <button type="button" class="btn-voice" onclick="startVoice('consequence', this)">🎤</button>
+        <button type="button" class="btn-voice btn-clear" title="Очистить" onclick="document.getElementById('consequence').value=''">🗑️</button>
       </div>
     </div>
   </div>
