@@ -6,6 +6,17 @@
   <a href="/admin/" class="btn btn-secondary">← Назад</a>
 </div>
 
+{% if password_reset %}
+<div class="alert alert-success" style="font-size:1.05em;">
+  🔑 Пароль пользователя <strong>{{ password_reset.full_name }}</strong> сброшен!<br>
+  <strong>Логин:</strong> <code id="reset-login">{{ password_reset.username }}</code>
+  <button type="button" class="btn btn-sm btn-secondary" onclick="copyText('reset-login')">📋</button><br>
+  <strong>Новый пароль:</strong> <code id="reset-pwd">{{ password_reset.password }}</code>
+  <button type="button" class="btn btn-sm btn-secondary" onclick="copyText('reset-pwd')">📋</button><br>
+  <em>Сохраните пароль — он больше не будет показан.</em>
+</div>
+{% endif %}
+
 {% if password_changed %}
 <div class="alert alert-success">
   ✅ Пароль пользователя <strong>{{ password_changed }}</strong> успешно изменён!
@@ -80,8 +91,10 @@ function copyToClipboard(elementId) {
           </form>
           {% endif %}
           {% if user.role == "superadmin" or u.role == "parent" %}
-          <button type="button" class="btn btn-sm btn-warning"
-            onclick="showResetPassword({{ u.id }}, '{{ u.full_name }}')">🔑 Пароль</button>
+          <form method="post" action="/admin/users/{{ u.id }}/auto-reset" style="display:inline"
+            onsubmit="return confirm('Сгенерировать новый пароль для {{ u.full_name }}?')">
+            <button type="submit" class="btn btn-sm btn-success">🎲 Новый пароль</button>
+          </form>
           {% endif %}
           {% if u.role != "superadmin" %}
           <form method="post" action="/admin/users/{{ u.id }}/delete" style="display:inline"
@@ -127,6 +140,13 @@ function copyToClipboard(elementId) {
 </div>
 
 <script>
+function copyText(id) {
+  const text = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    event.target.innerText = '✅';
+    setTimeout(() => event.target.innerText = '📋', 1500);
+  });
+}
 function showResetPassword(userId, userName) {
   document.getElementById('reset-user-name').textContent = 'Пользователь: ' + userName;
   document.getElementById('reset-form').action = '/admin/users/' + userId + '/reset-password';

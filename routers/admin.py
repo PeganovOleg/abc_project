@@ -137,3 +137,20 @@ def download_backup(request: Request, db: Session = Depends(get_db)):
         raise HTTPException(404, "Файл базы данных не найден")
     filename = os.path.basename(path)
     return FileResponse(path, media_type="application/octet-stream", filename=filename)
+
+@router.post("/users/{user_id}/auto-reset")
+def auto_reset_password(user_id: int, request: Request, db: Session = Depends(get_db)):
+    admin = require_admin(request, db)
+    u = db.query(User).filter(User.id == user_id).first()
+    if not u:
+        raise HTTPException(404)
+    if u.role in ("admin", "superadmin") and admin.role != "superadmin":
+        raise HTTPException(403, "Только суперадмин может сбрасывать пароли администраторов")
+    new_password = generate_password()
+    u.hashed_password = hash_password(new_password)
+    db.commit()
+    users = db.query(User).order_by(User.created_at.desc()).all()
+    return templates.TemplateResponse(request, "admin/users.html", {
+        "user": admin, "users": users, "new_user": None,
+        "password_reset": {"full_name": u.full_name, "username": u.username, "password": new_password}
+    })
