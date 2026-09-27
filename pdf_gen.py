@@ -7,18 +7,18 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 import io, os
 
-# Register fonts
 pdfmetrics.registerFont(TTFont("LiberationSans", "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf"))
 pdfmetrics.registerFont(TTFont("LiberationSans-Bold", "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf"))
 
-# Colors
-COLOR_TURQUOISE = colors.HexColor('#E0F7FA')      # светло-бирюзовый
-COLOR_LIGHT_BLUE = colors.HexColor('#E3F2FD')     # светло-голубой
-COLOR_ACCENT = colors.HexColor('#26A69A')      # менее насыщенный бирюзовый (на 40% светлее)
-COLOR_ACCENT_LIGHT = colors.HexColor('#4DB6AC')  # для градиентов
-COLOR_TEXT = colors.HexColor('#263238')            # тёмно-серый текст
-COLOR_WHITE = colors.white
-COLOR_BORDER = colors.HexColor('#B0BEC5')           # светло-серый бордюр
+# Светло-голубая палитра
+COLOR_HEADER_DARK  = colors.HexColor('#1565C0')   # тёмно-синий — заголовки ABC
+COLOR_HEADER_MID   = colors.HexColor('#1976D2')   # средний синий
+COLOR_BLUE_LIGHT   = colors.HexColor('#BBDEFB')   # светло-голубой фон (было бирюзовое)
+COLOR_BLUE_PALE    = colors.HexColor('#E3F2FD')   # очень светлый голубой
+COLOR_BLUE_ACCENT  = colors.HexColor('#42A5F5')   # голубой акцент рамки
+COLOR_TEXT         = colors.HexColor('#1A237E')   # тёмно-синий текст
+COLOR_WHITE        = colors.white
+COLOR_BORDER       = colors.HexColor('#90CAF9')   # голубая рамка
 
 def generate_pdf(obs) -> bytes:
     buffer = io.BytesIO()
@@ -28,14 +28,13 @@ def generate_pdf(obs) -> bytes:
 
     styles = getSampleStyleSheet()
 
-    # Styles
     style_title = ParagraphStyle(
         'Title', fontName='LiberationSans-Bold', fontSize=20,
-        textColor=COLOR_ACCENT, spaceAfter=12, leading=24
+        textColor=COLOR_HEADER_DARK, spaceAfter=12, leading=24
     )
     style_child_name = ParagraphStyle(
         'ChildName', fontName='LiberationSans-Bold', fontSize=14,
-        textColor=COLOR_ACCENT, leading=18
+        textColor=COLOR_HEADER_DARK, leading=18
     )
     style_label = ParagraphStyle(
         'Label', fontName='LiberationSans-Bold', fontSize=10,
@@ -64,16 +63,16 @@ def generate_pdf(obs) -> bytes:
     elements.append(Paragraph("📘 Дневник наблюдения ABC", style_title))
     elements.append(Spacer(1, 0.3*cm))
 
-    # === CHILD NAME HIGHLIGHT BLOCK ===
+    # === CHILD NAME — светло-голубой блок ===
     child_data = [
         [Paragraph("👤 Имя ребёнка:", style_label),
          Paragraph(obs.child_name, style_child_name)],
     ]
     child_table = Table(child_data, colWidths=[4*cm, 14*cm])
     child_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, -1), COLOR_TURQUOISE),
-        ('BOX', (0, 0), (-1, -1), 1.5, COLOR_ACCENT),
-        ('LEFTPADDING', (0, 0), (0, -1), 12),
+        ('BACKGROUND', (0, 0), (-1, -1), COLOR_BLUE_LIGHT),
+        ('BOX', (0, 0), (-1, -1), 1.5, COLOR_BLUE_ACCENT),
+        ('LEFTPADDING', (0, 0), (-1, -1), 12),
         ('RIGHTPADDING', (0, 0), (-1, -1), 12),
         ('TOPPADDING', (0, 0), (-1, -1), 10),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
@@ -82,7 +81,7 @@ def generate_pdf(obs) -> bytes:
     elements.append(child_table)
     elements.append(Spacer(1, 0.4*cm))
 
-    # === HEADER INFO (light blue background) ===
+    # === HEADER INFO — очень светлый голубой ===
     header_data = [
         [Paragraph("Имя наблюдателя:", style_label), Paragraph(obs.observer_name, style_normal),
          Paragraph("Дата:", style_label), Paragraph(obs.obs_date, style_normal)],
@@ -91,7 +90,8 @@ def generate_pdf(obs) -> bytes:
     ]
     header_table = Table(header_data, colWidths=[4*cm, 5.5*cm, 3*cm, 5.5*cm])
     header_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, -1), COLOR_LIGHT_BLUE),
+        ('BACKGROUND', (0, 0), (-1, 0), COLOR_BLUE_PALE),
+        ('BACKGROUND', (0, 1), (-1, 1), COLOR_WHITE),
         ('BOX', (0, 0), (-1, -1), 0.5, COLOR_BORDER),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, COLOR_BORDER),
         ('LEFTPADDING', (0, 0), (-1, -1), 8),
@@ -103,7 +103,7 @@ def generate_pdf(obs) -> bytes:
     elements.append(header_table)
     elements.append(Spacer(1, 0.6*cm))
 
-    # === ABC TABLE ===
+    # === ABC TABLE — градиент через чередование строк ===
     abc_data = [
         [
             Paragraph("<b>A — Предшествующее событие</b><br/><font size=9>(Antecedent)</font><br/>Что произошло до поведения", style_cell_header),
@@ -118,9 +118,15 @@ def generate_pdf(obs) -> bytes:
     ]
     abc_table = Table(abc_data, colWidths=[6*cm, 6*cm, 6*cm])
     abc_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), COLOR_ACCENT),
+        # Заголовок — тёмно-синий градиент через три колонки
+        ('BACKGROUND', (0, 0), (0, 0), COLOR_HEADER_DARK),
+        ('BACKGROUND', (1, 0), (1, 0), COLOR_HEADER_MID),
+        ('BACKGROUND', (2, 0), (2, 0), colors.HexColor('#2196F3')),
         ('TEXTCOLOR', (0, 0), (-1, 0), COLOR_WHITE),
-        ('BACKGROUND', (0, 1), (-1, 1), COLOR_WHITE),
+        # Содержимое — чередование оттенков голубого
+        ('BACKGROUND', (0, 1), (0, 1), COLOR_BLUE_PALE),
+        ('BACKGROUND', (1, 1), (1, 1), colors.HexColor('#E8F4FD')),
+        ('BACKGROUND', (2, 1), (2, 1), COLOR_BLUE_PALE),
         ('BOX', (0, 0), (-1, -1), 1, COLOR_BORDER),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, COLOR_BORDER),
         ('LEFTPADDING', (0, 0), (-1, -1), 10),
@@ -140,9 +146,9 @@ def generate_pdf(obs) -> bytes:
     ]
     func_table = Table(func_data, colWidths=[18*cm])
     func_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), COLOR_TURQUOISE),
+        ('BACKGROUND', (0, 0), (-1, 0), COLOR_BLUE_LIGHT),
         ('BACKGROUND', (0, 1), (-1, 1), COLOR_WHITE),
-        ('BOX', (0, 0), (-1, -1), 1, COLOR_ACCENT),
+        ('BOX', (0, 0), (-1, -1), 1, COLOR_BLUE_ACCENT),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, COLOR_BORDER),
         ('LEFTPADDING', (0, 0), (-1, -1), 10),
         ('RIGHTPADDING', (0, 0), (-1, -1), 10),
@@ -153,7 +159,6 @@ def generate_pdf(obs) -> bytes:
     ]))
     elements.append(func_table)
 
-    # Build PDF
     doc.build(elements)
     buffer.seek(0)
     return buffer.read()
