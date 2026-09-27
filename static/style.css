@@ -249,8 +249,15 @@ body > main { padding-top: 0.5rem; }
 @media (max-width: 600px) {
   .nav-links { display: none !important; }
   .nav-user { display: none !important; }
-  .nav-mobile-right { display: flex !important; }
-  .navbar { justify-content: space-between; flex-wrap: nowrap; padding: 0.6rem 1rem; }
-  .nav-brand { font-size: 1rem; white-space: nowrap; }
-  .nav-user-mobile { font-size: 0.8rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 120px; }
+  .nav-mobile-right { display: flex !important; align-items: center; gap: 0.5rem; }
+  .navbar {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0.6rem 1rem !important;
+  }
+  .nav-brand { font-size: 0.95rem; white-space: nowrap; flex-shrink: 0; }
+  .nav-user-mobile { font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
 }
